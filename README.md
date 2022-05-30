@@ -1,8 +1,8 @@
 # ASHRAE Global Thermal Comfort Database 
 
-The ASHRAE Global Thermal Comfort Database II includes complete sets of objective indoor climatic observations with accompanying `right-here-right-now` subjective evaluations by the building occupants who were exposed to them. The database is intended to support diverse inquiries about thermal comfort in field settings. This is the official repository which contains the code used to maintain the Database II. You can download the latest version of the database from [here](https://datadryad.org/stash/dataset/doi:10.6078/D1F671)
+The ASHRAE Global Thermal Comfort Database II combines sets of objective indoor environmental measurements with accompanying `right-here-right-now` subjective evaluations by occupants from buildings around the world. The database is intended to support diverse inquiries about thermal comfort in field settings. This is the official repository which contains the code used to maintain the Database II from version 2.1 onward. You can download the latest version of the database from [here](https://datadryad.org/stash/dataset/doi:10.6078/D1F671).
 
-This repository contains the source code we used to generate each new version of the dataset. This allows you to track the changes we have implemented. We highly encorage you to sumbit an issue if you spot any errors or you would like us to implement some changes. The repository comprises different folders, each containing the source code and data we used to generate a new version of the database.
+This repository contains the source code we used to generate each new version of the dataset. This allows you to track the changes we have implemented. We encourage you to submit an issue if you spot any errors or you would like us to implement some changes. The repository comprises different folders, each containing the source code and data we used to generate a new version of the database.
 
 ## Changelog
 
@@ -13,7 +13,7 @@ This is the first major update to the ASHRAE Global Thermal Comfort Database II 
 The major updates to the database are:
 
 1. 6,566 new records from field studies in India, Malaysia, Italy, Japan, Indonesia, Singapore, and Cyprus. Thanks to Hasim Altan (Arkin University of Creative Arts and Design), Siti Aisyah Damiati (University of Adelaide), Harimi Djamila (Universiti Malaysia Sabah), Jeetika Malik (Lawrence Berkeley National Laboratory), Bertug Ozarisoy (University of East London), Elisabetta Maria Patane (University of Bath), and Rajan Rawal (CEPT University) for kindly sharing their data with the community.
-2. Improvements to the meteorological data. In the earlier version of the database, the source and quality of the meteorological data was unclear in some cases. We now use the NOAA Integrated Surface Database (ISD) for meteorological data where possible. Thanks to Peixian Li (Tongji University) for adding the timestamps (where available) from the original datasets. Meteorological data from either the original dataset or the ISD are now included along with the relevant metadata.
+2. Improvements to the meteorological data. In the earlier version of the database, the source and quality of the meteorological data was unclear in some cases. We now use the NOAA Integrated Surface Database (ISD) for meteorological data where possible. Thanks to Peixian Li (Tongji University) for adding the timestamps from the original datasets (where available). Meteorological data from either the original dataset or the ISD are now included along with the relevant metadata.
 3. The database is now split into a metadata table and a measurements table. This should make working with the full dataset quicker and easier due to smaller file sizes and new fields in the metadata table.
 
 There are many other changes included in this update. The full change log is below:
@@ -25,13 +25,13 @@ There are many other changes included in this update. The full change log is bel
 - Added 6,566 measurements from new data contributions
 - Split database into metadata and measurement tables
 - Recoded many categorical scale variables to standardised English label text
-- Removed all imperial units
-- Renamed headers to remove spaces and special characters (see readme)
-- Renamed headers for PMV inputs to align with software packages [Marcel Schweiker - RWTH Aachen University; Federico Tartarini - BEARS]
+- Dropped all imperial units
+- Renamed headers to remove spaces and special characters
+- Renamed headers for PMV inputs to align with software packages [Federico Tartarini - BEARS; Marcel Schweiker - RWTH Aachen University]
 - Recoded cooling types `Mechanically ventilated`; and `Mixed (hybrid)` into `mixed mode`
 - Recoded season when timestamp and location is known
 - Added average daily temperature calculated from ISD data
-- Added running mean outdoor temperature
+- Added running mean outdoor temperature from ISD data
 - Added inferred building id based on unique groupings of publication, country, city, season, building type, and cooling type
 - Added inferred building ID flag to metadata table
 - Added sample size for each building ID to metadata table
@@ -42,9 +42,9 @@ There are many other changes included in this update. The full change log is bel
 - Added categorical age field flag to metadata table [Jing Xiong - The University of Sydney]
 - Added environmental control flag to metadata table
 - Added timestamp flag to metadata table
+- Added region to metadata table
 - Replaced full reference in metadata table with DOI where known
 - Standardised country names in metadata table
-- Added region to metadata table
 - Fixed season in Oseland dataset [Carlucci; Matteo Favero - NTNU]
 - Added building ID in Oseland dataset
 - Fixed asv and building type in Zhangeri dataset [Salvatore Carlucci - The Cyprus Institute; Matteo Favero - Norwegian University of Science and Technology]
@@ -74,11 +74,11 @@ There are many other changes included in this update. The full change log is bel
 | `records`          | Number of records for that building ID                                                                                                                                                          |
 | `has_age`          | Flag indicating if there age was recorded [yes, no] and if it was a categorical variable in the original data source [categorical]                                                              |
 | `has_ec`           | Flag indicating if environmental controls were in the original data source [yes, no]                                                                                                            |
-| `has_timestamp`    | Flag indicating if measurement timestamp was in the original data source                                                                                                                        |
+| `has_timestamp`    | Flag indicating if measurement timestamp was in the original data source [yes, no]                                                                                                                       |
 | `timezone`         | IANA time zone of field study                                                                                                                                                                   |
 | `met_source`       | Source of meteorological data for `t_out` and `rh_out` [`ghcn_d` = from GHCN-D, `original_data` = from original data source; `rp884` = from RP884 database]                                     |
 | `isd_station`      | ISD station code for `t_out_isd`, `rh_out_isd` and `t_mot_isd`                                                                                                                                  |
-| `isd_distance`     | Estimated distance of ISD station to city of field study [m]                                                                                                                                    |
+| `isd_distance`     | Estimated distance of ISD station to city of field study [km]                                                                                                                                    |
 | `database`         | Version of database when data source was added [1, 2, 2.1]                                                                                                                                      |
 
 **Key for measurements table**
@@ -92,7 +92,7 @@ There are many other changes included in this update. The full change log is bel
 | `subject_id`                 | Unique subject identifier for future studies with repeat samples [integer]                                                                                                                                                                                                                                                                                       |
 | `age`                        | Age of subject [years]. Note: some studies used age ranges instead of years - see `has_age` in metadata table                                                                                                                                                                                                                                                    |
 | `gender`                     | Gender of subject [female, male]                                                                                                                                                                                                                                                                                                                                 |
-| `ht`                         | Height of subject [cm]                                                                                                                                                                                                                                                                                                                                           |
+| `ht`                         | Height of subject [m]                                                                                                                                                                                                                                                                                                                                           |
 | `wt`                         | Weight of subject [kg]                                                                                                                                                                                                                                                                                                                                           |
 | `ta`                         | Air temperature measured in the occupied zone [°C]                                                                                                                                                                                                                                                                                                               |
 | `ta_h`                       | Air temperature measured at 1.1 m above the floor [°C]                                                                                                                                                                                                                                                                                                           |
@@ -126,7 +126,7 @@ There are many other changes included in this update. The full change log is bel
 | `thermal_comfort`            | Thermal comfort [1 (very uncomfortable) to 6 (very comfortable)]                                                                                                                                                                                                                                                                                                 |
 | `air_movement_acceptability` | Air movement acceptability [acceptable, unacceptable]                                                                                                                                                                                                                                                                                                            |
 | `air_movement_preference`    | Air movement preference [less, no change, more]                                                                                                                                                                                                                                                                                                                  |
-| `blind_curtain`              | State of blinds or curtains if known [0 = open; 1 = closed]                                                                                                                                                                                                                                                                                                      |
+| `blind_curtain`              | State of blinds or curtains [0 = open; 1 = closed]                                                                                                                                                                                                                                                                                                      |
 | `fan`                        | State of fan [0 = off, 1 = on]                                                                                                                                                                                                                                                                                                                                   |
 | `window`                     | State of window [0 = open, 1 = closed]                                                                                                                                                                                                                                                                                                                           |
 | `door`                       | State of doors [0 = open, 1 = closed]                                                                                                                                                                                                                                                                                                                            |
@@ -139,7 +139,7 @@ There are many other changes included in this update. The full change log is bel
 
 ## Contributing
 
-You can contribute to the project by sending us your dataset.
+You can contribute to the project by sending us your dataset. Please clean and collate the data into a single .csv file that matches the existing DBII structure outlined. This simple [web tool](https://databaseqc.shinyapps.io/submission/) will help error check and format the data. It also has a downloadable .csv template file. Note that this tool reflects the old database format - we will work to update the tool soon.
 
 ### Reporting issues
 
