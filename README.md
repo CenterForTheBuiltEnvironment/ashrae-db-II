@@ -1,4 +1,12 @@
-**ASHRAE Global Thermal Comfort Database version 2.1**
+# ASHRAE Global Thermal Comfort Database 
+
+The ASHRAE Global Thermal Comfort Database II includes complete sets of objective indoor climatic observations with accompanying `right-here-right-now` subjective evaluations by the building occupants who were exposed to them. The database is intended to support diverse inquiries about thermal comfort in field settings. This is the official repository which contains the code used to maintain the Database II. You can download the latest version of the database from [here](https://datadryad.org/stash/dataset/doi:10.6078/D1F671)
+
+This repository contains the source code we used to generate each new version of the dataset. This allows you to track the changes we have implemented. We highly encorage you to sumbit an issue if you spot any errors or you would like us to implement some changes. The repository comprises different folders, each containing the source code and data we used to generate a new version of the database.
+
+## Changelog
+
+### Version 2.1
 
 This is the first major update to the ASHRAE Global Thermal Comfort Database II since it was published in 2018. In the time since release, it has been used by hundreds of researchers who have found errors and requested new features. This update aims to address some of those while improving operability with other resources. As a result, there are breaking changes.
 
@@ -48,81 +56,91 @@ There are many other changes included in this update. The full change log is bel
 
 **Key for metadata table**
 
-| _parameter_ | _description_ |
-| --- | --- |
-| `building_id` | Unique building identifier [integer] |
-| `building_id_inf` | Flag indicating if unique building identifier was from original data source [no] or inferred [yes] from unique groupings of publication, country, city, season, building type, and cooling type |
-| `contributor` | Principal contact person regarding the data |
-| `publication` | Published paper describing the project from where the data was collected |
-| `region` | Region of field study |
-| `country` | Country of field study |
-| `city` | City of field study |
-| `lat` | Latitude of city [°] |
-| `lon` | Latitude of city [°] |
-| `climate` | Type of climate according to Köppen climate classification |
-| `building_type` | Type of building [office, multifamily housing, classroom, senior center, other] |
-| `cooling_type` | Cooling strategy of building [air conditioned, mixed mode, naturally ventilated] |
-| `year` | Year of field study [yyyy] |
-| `records` | Number of records for that building ID |
-| `has_age` | Flag indicating if there age was recorded [yes, no] and if it was a categorical variable in the original data source [categorical] |
-| `has_ec` | Flag indicating if environmental controls were in the original data source [yes, no] |
-| `has_timestamp` | Flag indicating if measurement timestamp was in the original data source |
-| `timezone` | IANA time zone of field study |
-| `met_source` | Source of meteorological data for `t_out` and `rh_out` [`ghcn_d` = from GHCN-D, `original_data` = from original data source; `rp884` = from RP884 database] |
-| `isd_station` | ISD station code for `t_out_isd`, `rh_out_isd` and `t_mot_isd` |
-| `isd_distance` | Estimated distance of ISD station to city of field study [m] |
-| `database` | Version of database when data source was added [1, 2, 2.1] |
+| _parameter_        | _description_                                                                                                                                                                                   |
+|--------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `building_id`      | Unique building identifier [integer]                                                                                                                                                            |
+| `building_id_inf`  | Flag indicating if unique building identifier was from original data source [no] or inferred [yes] from unique groupings of publication, country, city, season, building type, and cooling type |
+| `contributor`      | Principal contact person regarding the data                                                                                                                                                     |
+| `publication`      | Published paper describing the project from where the data was collected                                                                                                                        |
+| `region`           | Region of field study                                                                                                                                                                           |
+| `country`          | Country of field study                                                                                                                                                                          |
+| `city`             | City of field study                                                                                                                                                                             |
+| `lat`              | Latitude of city [°]                                                                                                                                                                            |
+| `lon`              | Latitude of city [°]                                                                                                                                                                            |
+| `climate`          | Type of climate according to Köppen climate classification                                                                                                                                      |
+| `building_type`    | Type of building [office, multifamily housing, classroom, senior center, other]                                                                                                                 |
+| `cooling_type`     | Cooling strategy of building [air conditioned, mixed mode, naturally ventilated]                                                                                                                |
+| `year`             | Year of field study [yyyy]                                                                                                                                                                      |
+| `records`          | Number of records for that building ID                                                                                                                                                          |
+| `has_age`          | Flag indicating if there age was recorded [yes, no] and if it was a categorical variable in the original data source [categorical]                                                              |
+| `has_ec`           | Flag indicating if environmental controls were in the original data source [yes, no]                                                                                                            |
+| `has_timestamp`    | Flag indicating if measurement timestamp was in the original data source                                                                                                                        |
+| `timezone`         | IANA time zone of field study                                                                                                                                                                   |
+| `met_source`       | Source of meteorological data for `t_out` and `rh_out` [`ghcn_d` = from GHCN-D, `original_data` = from original data source; `rp884` = from RP884 database]                                     |
+| `isd_station`      | ISD station code for `t_out_isd`, `rh_out_isd` and `t_mot_isd`                                                                                                                                  |
+| `isd_distance`     | Estimated distance of ISD station to city of field study [m]                                                                                                                                    |
+| `database`         | Version of database when data source was added [1, 2, 2.1]                                                                                                                                      |
 
 **Key for measurements table**
 
-| _parameter_ | _description_ |
-| --- | --- |
-| `building_id` | Unique building identifier [integer]. Note: some building IDs are inferred - see `building_id_inf` in metadata table |
-| `year` | Year of field study [yyyy] |
-| `timestamp` | Timestamp of measurement [yyyy-mm-dd] |
-| `season` | Season measurement was made [summer, winter, hot/wet, cool/dry]. Note: based on the following assumptions when timestamp and location are known: northern hemisphere latitudes <20 are `hot/wet` from May-Oct and `cool/dry` from Nov-Apr; northern hemisphere latitudes >=20 are `summer` May-Oct and `winter` from Nov-Apr; vice versa for Southern Hemisphere |
-| `subject_id` | Unique subject identifier for future studies with repeat samples [integer] |
-| `age` | Age of subject [years]. Note: some studies used age ranges instead of years - see `has_age` in metadata table |
-| `gender` | Gender of subject [female, male] |
-| `ht` | Height of subject [cm] |
-| `wt` | Weight of subject [kg] |
-| `ta` | Air temperature measured in the occupied zone [°C] |
-| `ta_h` | Air temperature measured at 1.1 m above the floor [°C] |
-| `ta_m` | Air temperature measured at 0.6 m above the floor [°C] |
-| `ta_l` | Air temperature measured at 0.1 m above the floor [°C] |
-| `top` | Operative temperature calculated for the occupied zone [°C] |
-| `tr` | Radiant temperature measured in the occupied zone [°C] |
-| `tg` | Globe temperature measured in the occupied zone [°C] |
-| `tg_h` | Globe temperature measured at 1.1 m above the floor [°C] |
-| `tg_m` | Globe temperature measured at 0.6 m above the floor [°C] |
-| `tg_l` | Globe temperature measured at 0.1 m above the floor [°C] |
-| `rh` | Relative humidity [%] |
-| `vel` | Air speed measured in the occupied zone [m/s] |
-| `vel_h` | Air speed measured at 1.1 m above the floor [m/s] |
-| `vel_m` | Air speed measured at 0.6 m above the floor [m/s] |
-| `vel_l` | Air speed measured at 0.1 m above the floor [m/s] |
-| `met` | Average metabolic rate of the subject [met] |
-| `clo` | Intrinsic clothing ensemble insulation of the subject [clo] |
-| `activity_10` | Average metabolic rate of the subject in the last 10 minutes [met] |
-| `activity_20` | Average metabolic rate of the subject in the last 20 minutes [met] |
-| `activity_30` | Average metabolic rate of the subject in the last 30 minutes [met] |
-| `activity_60` | Average metabolic rate of the subject in the last 60 minutes [met] |
-| `thermal_sensation` | Vote on the ASHRAE thermal sensation scale [-3 (cold) to 0 (neutral) +3 (hot)] |
-| `pmv` | Predicted mean vote [-3 (cold) to 0 (neutral) +3 (hot)] |
-| `ppd` | Predicted percentage dissatisfied [%] |
-| `set` | Standard effective temperature [°C] |
-| `thermal_acceptability` | Thermal acceptability [acceptable, unacceptable] |
-| `thermal_preference` | Thermal preference [cooler, no change, warmer] |
-| `thermal_comfort` | Thermal comfort [1 (very uncomfortable) to 6 (very comfortable)] |
-| `air_movement_acceptability` | Air movement acceptability [acceptable, unacceptable] |
-| `air_movement_preference` | Air movement preference [less, no change, more] |
-| `blind_curtain` | State of blinds or curtains if known [0 = open; 1 = closed] |
-| `fan` | State of fan [0 = off, 1 = on] |
-| `window` | State of window [0 = open, 1 = closed] |
-| `door` | State of doors [0 = open, 1 = closed] |
-| `heater` | State of heater [0 = off, 1 = on] |
-| `t_out `| Outdoor air temperature from original dataset [°C] |
-| `rh_out` | Outdoor relative humidity from original dataset [°C] |
-| `t_out_isd` | Average daily outdoor air temperature from ISD [°C] |
-| `rh_out_isd` | Average daily outdoor air temperature from ISD [°C] |
-| `t_mot_isd` | Calculated 7-day running mean outdoor temperature [°C] |
+| _parameter_                  | _description_                                                                                                                                                                                                                                                                                                                                                    |
+|------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `building_id`                | Unique building identifier [integer]. Note: some building IDs are inferred - see `building_id_inf` in metadata table                                                                                                                                                                                                                                             |
+| `year`                       | Year of field study [yyyy]                                                                                                                                                                                                                                                                                                                                       |
+| `timestamp`                  | Timestamp of measurement [yyyy-mm-dd]                                                                                                                                                                                                                                                                                                                            |
+| `season`                     | Season measurement was made [summer, winter, hot/wet, cool/dry]. Note: based on the following assumptions when timestamp and location are known: northern hemisphere latitudes <20 are `hot/wet` from May-Oct and `cool/dry` from Nov-Apr; northern hemisphere latitudes >=20 are `summer` May-Oct and `winter` from Nov-Apr; vice versa for Southern Hemisphere |
+| `subject_id`                 | Unique subject identifier for future studies with repeat samples [integer]                                                                                                                                                                                                                                                                                       |
+| `age`                        | Age of subject [years]. Note: some studies used age ranges instead of years - see `has_age` in metadata table                                                                                                                                                                                                                                                    |
+| `gender`                     | Gender of subject [female, male]                                                                                                                                                                                                                                                                                                                                 |
+| `ht`                         | Height of subject [cm]                                                                                                                                                                                                                                                                                                                                           |
+| `wt`                         | Weight of subject [kg]                                                                                                                                                                                                                                                                                                                                           |
+| `ta`                         | Air temperature measured in the occupied zone [°C]                                                                                                                                                                                                                                                                                                               |
+| `ta_h`                       | Air temperature measured at 1.1 m above the floor [°C]                                                                                                                                                                                                                                                                                                           |
+| `ta_m`                       | Air temperature measured at 0.6 m above the floor [°C]                                                                                                                                                                                                                                                                                                           |
+| `ta_l`                       | Air temperature measured at 0.1 m above the floor [°C]                                                                                                                                                                                                                                                                                                           |
+| `top`                        | Operative temperature calculated for the occupied zone [°C]                                                                                                                                                                                                                                                                                                      |
+| `tr`                         | Radiant temperature measured in the occupied zone [°C]                                                                                                                                                                                                                                                                                                           |
+| `tg`                         | Globe temperature measured in the occupied zone [°C]                                                                                                                                                                                                                                                                                                             |
+| `tg_h`                       | Globe temperature measured at 1.1 m above the floor [°C]                                                                                                                                                                                                                                                                                                         |
+| `tg_m`                       | Globe temperature measured at 0.6 m above the floor [°C]                                                                                                                                                                                                                                                                                                         |
+| `tg_l`                       | Globe temperature measured at 0.1 m above the floor [°C]                                                                                                                                                                                                                                                                                                         |
+| `rh`                         | Relative humidity [%]                                                                                                                                                                                                                                                                                                                                            |
+| `vel`                        | Air speed measured in the occupied zone [m/s]                                                                                                                                                                                                                                                                                                                    |
+| `vel_h`                      | Air speed measured at 1.1 m above the floor [m/s]                                                                                                                                                                                                                                                                                                                |
+| `vel_m`                      | Air speed measured at 0.6 m above the floor [m/s]                                                                                                                                                                                                                                                                                                                |
+| `vel_l`                      | Air speed measured at 0.1 m above the floor [m/s]                                                                                                                                                                                                                                                                                                                |
+| `vel_r`                      | Relative air speed used to calculate the PMV [m/s]                                                                                                                                                                                                                                                                                                               |
+| `met`                        | Average metabolic rate of the subject [met]                                                                                                                                                                                                                                                                                                                      |
+| `clo`                        | Intrinsic clothing ensemble insulation of the subject [clo]                                                                                                                                                                                                                                                                                                      |
+| `clo_d`                      | Dynamic clothing, used to calculate the PMV [clo]                                                                                                                                                                                                                                                                                                                |
+| `activity_10`                | Average metabolic rate of the subject in the last 10 minutes [met]                                                                                                                                                                                                                                                                                               |
+| `activity_20`                | Average metabolic rate of the subject in the last 20 minutes [met]                                                                                                                                                                                                                                                                                               |
+| `activity_30`                | Average metabolic rate of the subject in the last 30 minutes [met]                                                                                                                                                                                                                                                                                               |
+| `activity_60`                | Average metabolic rate of the subject in the last 60 minutes [met]                                                                                                                                                                                                                                                                                               |
+| `thermal_sensation`          | Vote on the ASHRAE thermal sensation scale [-3 (cold) to 0 (neutral) +3 (hot)]                                                                                                                                                                                                                                                                                   |
+| `pmv`                        | Predicted mean vote [-3 (cold) to 0 (neutral) +3 (hot)]                                                                                                                                                                                                                                                                                                          |
+| `ppd`                        | Predicted percentage dissatisfied [%]                                                                                                                                                                                                                                                                                                                            |
+| `set`                        | Standard effective temperature [°C]                                                                                                                                                                                                                                                                                                                              |
+| `thermal_acceptability`      | Thermal acceptability [acceptable, unacceptable]                                                                                                                                                                                                                                                                                                                 |
+| `thermal_preference`         | Thermal preference [cooler, no change, warmer]                                                                                                                                                                                                                                                                                                                   |
+| `thermal_comfort`            | Thermal comfort [1 (very uncomfortable) to 6 (very comfortable)]                                                                                                                                                                                                                                                                                                 |
+| `air_movement_acceptability` | Air movement acceptability [acceptable, unacceptable]                                                                                                                                                                                                                                                                                                            |
+| `air_movement_preference`    | Air movement preference [less, no change, more]                                                                                                                                                                                                                                                                                                                  |
+| `blind_curtain`              | State of blinds or curtains if known [0 = open; 1 = closed]                                                                                                                                                                                                                                                                                                      |
+| `fan`                        | State of fan [0 = off, 1 = on]                                                                                                                                                                                                                                                                                                                                   |
+| `window`                     | State of window [0 = open, 1 = closed]                                                                                                                                                                                                                                                                                                                           |
+| `door`                       | State of doors [0 = open, 1 = closed]                                                                                                                                                                                                                                                                                                                            |
+| `heater`                     | State of heater [0 = off, 1 = on]                                                                                                                                                                                                                                                                                                                                |
+| `t_out `                     | Outdoor air temperature from original dataset [°C]                                                                                                                                                                                                                                                                                                               |
+| `rh_out`                     | Outdoor relative humidity from original dataset [°C]                                                                                                                                                                                                                                                                                                             |
+| `t_out_isd`                  | Average daily outdoor air temperature from ISD [°C]                                                                                                                                                                                                                                                                                                              |
+| `rh_out_isd`                 | Average daily outdoor air temperature from ISD [°C]                                                                                                                                                                                                                                                                                                              |
+| `t_mot_isd`                  | Calculated 7-day running mean outdoor temperature [°C]                                                                                                                                                                                                                                                                                                           |
+
+## Contributing
+
+You can contribute to the project by sending us your dataset.
+
+### Reporting issues
+
+You can report issues with the database by using [this link](https://github.com/FedericoTartarini/ashrae-db-II/issues)
