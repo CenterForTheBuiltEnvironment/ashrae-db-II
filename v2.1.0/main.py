@@ -1,6 +1,11 @@
+import numpy as np
 import pandas as pd
 from pythermalcomfort.models import pmv_ppd, set_tmp
-from pythermalcomfort.utilities import v_relative, clo_dynamic
+from pythermalcomfort.utilities import (
+    v_relative,
+    clo_dynamic,
+    running_mean_outdoor_temperature,
+)
 
 # read old version of the DB
 df = pd.read_csv(
@@ -8,6 +13,28 @@ df = pd.read_csv(
     low_memory=False,
     compression="gzip",
 )
+
+df_weather = pd.read_csv(
+    "./v2.1.0/weather_data.gz",
+    compression="gzip",
+)
+
+df_weather.date = pd.to_datetime(df_weather.date).dt.date
+df_weather["t_rmt"] = np.nan
+for station in df_weather.code.unique():
+    df_station = df_weather.query("code == @station").sort_values("date")
+    for date in df_station.date.unique():
+        dates = pd.date_range(end=date, periods=8)
+        _ = df_station[
+            (df_station.date <= dates[-2].date()) & (df_station.date >= dates[0].date())
+        ]
+        _ = _[["date", "t_out_isd"]].sort_values("date", ascending=False)
+        if _.shape[0] == 7:
+            t_rmt = running_mean_outdoor_temperature(_.t_out_isd.values)
+            df_weather.loc[
+                (df_weather.code == station) & (df_weather.date == date), "t_rmt"
+            ] = t_rmt
+df_weather.to_csv("./v2.1.0/weather_data_t_rmt.gz", compression="gzip", index=False)
 
 # dropping entries without ta and keeping only those with 10 < ta < 40
 df = df[df["ta"] < 40]
@@ -123,7 +150,7 @@ def data_validation(data):
 
     # check data types
     for col in data.columns[[3, 36, 37]]:
-        print(set(type(x) for x in data[col].unique()))
+        print(col, set(type(x) for x in data[col].unique()))
 
     f, axs = plt.subplots(1, 2, sharey=True, sharex=True, constrained_layout=True)
     sc = axs[0].scatter(x="pmv_ashrae", y="pmv", data=data, s=1, alpha=0.3)
