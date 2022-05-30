@@ -1,6 +1,6 @@
 # ASHRAE Global Thermal Comfort Database 
 
-The ASHRAE Global Thermal Comfort Database II combines sets of objective indoor environmental measurements with accompanying `right-here-right-now` subjective evaluations by occupants from buildings around the world. The database is intended to support diverse inquiries about thermal comfort in field settings. This is the official repository which contains the code used to maintain the Database II from version 2.1 onward. You can download the latest version of the database from [here](https://datadryad.org/stash/dataset/doi:10.6078/D1F671).
+The ASHRAE Global Thermal Comfort Database II combines sets of objective indoor environmental measurements with accompanying "right-here-right-now" subjective evaluations by occupants from buildings around the world. The database is intended to support diverse inquiries about thermal comfort in field settings. This is the official repository which contains the code used to maintain the Database II from version 2.1 onward. You can download the latest version of the database from [here](https://datadryad.org/stash/dataset/doi:10.6078/D1F671).
 
 This repository contains the source code we used to generate each new version of the dataset. This allows you to track the changes we have implemented. We encourage you to submit an issue if you spot any errors or you would like us to implement some changes. The repository comprises different folders, each containing the source code and data we used to generate a new version of the database.
 
@@ -24,6 +24,8 @@ There are many other changes included in this update. The full change log is bel
 - Added timestamp to datasets where known [Ariel Li - Tongji University]
 - Added 6,566 measurements from new data contributions
 - Split database into metadata and measurement tables
+- Recalculated PMV/PPD using pythermalcomfort
+- Dropped records with missing `ta`
 - Recoded many categorical scale variables to standardised English label text
 - Dropped all imperial units
 - Renamed headers to remove spaces and special characters
@@ -50,6 +52,7 @@ There are many other changes included in this update. The full change log is bel
 - Fixed asv and building type in Zhangeri dataset [Salvatore Carlucci - The Cyprus Institute; Matteo Favero - Norwegian University of Science and Technology]
 - Added building ID in Zhangeri dataset
 - Removed thermal comfort vote for Zhangeri dataset [Salvatore Carlucci - The Cyprus Institute; Matteo Favero - Norwegian University of Science and Technology]
+- Added unique identifier for records (`record_id`) to help error reporting
 - Added new column (`subject_id`) for future submissions with repeated measures
 - Added .rds file with correct data types
 
@@ -86,7 +89,6 @@ There are many other changes included in this update. The full change log is bel
 | _parameter_                  | _description_                                                                                                                                                                                                                                                                                                                                                    |
 |------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `building_id`                | Unique building identifier [integer]. Note: some building IDs are inferred - see `building_id_inf` in metadata table                                                                                                                                                                                                                                             |
-| `year`                       | Year of field study [yyyy]                                                                                                                                                                                                                                                                                                                                       |
 | `timestamp`                  | Timestamp of measurement [yyyy-mm-dd]                                                                                                                                                                                                                                                                                                                            |
 | `season`                     | Season measurement was made [summer, winter, hot/wet, cool/dry]. Note: based on the following assumptions when timestamp and location are known: northern hemisphere latitudes <20 are `hot/wet` from May-Oct and `cool/dry` from Nov-Apr; northern hemisphere latitudes >=20 are `summer` May-Oct and `winter` from Nov-Apr; vice versa for Southern Hemisphere |
 | `subject_id`                 | Unique subject identifier for future studies with repeat samples [integer]                                                                                                                                                                                                                                                                                       |
