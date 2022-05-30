@@ -25,6 +25,8 @@ There are many other changes included in this update. The full change log is bel
 - Added 6,566 measurements from new data contributions
 - Split database into metadata and measurement tables
 - Recalculated PMV/PPD using pythermalcomfort
+- Shared python code used to calculate PMV/PPD
+- Shared R code with an example analysis of adaptive thermal comfort
 - Dropped records with missing `ta`
 - Recoded many categorical scale variables to standardised English label text
 - Dropped all imperial units
@@ -54,7 +56,6 @@ There are many other changes included in this update. The full change log is bel
 - Removed thermal comfort vote for Zhangeri dataset [Salvatore Carlucci - The Cyprus Institute; Matteo Favero - Norwegian University of Science and Technology]
 - Added unique identifier for records (`record_id`) to help error reporting
 - Added new column (`subject_id`) for future submissions with repeated measures
-- Added .rds file with correct data types
 
 
 **Key for metadata table**
