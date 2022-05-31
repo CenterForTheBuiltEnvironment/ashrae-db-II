@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from pythermalcomfort.models import pmv_ppd, set_tmp
@@ -6,111 +7,6 @@ from pythermalcomfort.utilities import (
     clo_dynamic,
     running_mean_outdoor_temperature,
 )
-
-# read old version of the DB
-df = pd.read_csv(
-    "./v2.1.0/db_measurements_v2.0.1.csv.gz",
-    low_memory=False,
-    compression="gzip",
-)
-
-df_weather = pd.read_csv(
-    "./v2.1.0/weather_data.gz",
-    compression="gzip",
-)
-
-df_weather.date = pd.to_datetime(df_weather.date).dt.date
-df_weather["t_rmt"] = np.nan
-for station in df_weather.code.unique():
-    df_station = df_weather.query("code == @station").sort_values("date")
-    for date in df_station.date.unique():
-        dates = pd.date_range(end=date, periods=8)
-        _ = df_station[
-            (df_station.date <= dates[-2].date()) & (df_station.date >= dates[0].date())
-        ]
-        _ = _[["date", "t_out_isd"]].sort_values("date", ascending=False)
-        if _.shape[0] == 7:
-            t_rmt = running_mean_outdoor_temperature(_.t_out_isd.values)
-            df_weather.loc[
-                (df_weather.code == station) & (df_weather.date == date), "t_rmt"
-            ] = t_rmt
-df_weather.to_csv("./v2.1.0/weather_data_t_rmt.gz", compression="gzip", index=False)
-
-# dropping entries without ta and keeping only those with 10 < ta < 40
-df = df[df["ta"] < 40]
-df = df[df["ta"] > 10]
-
-# filtering other variables too
-df = df.drop(df[(df.met < 0) | (df.met > 4)].index)
-df = df.drop(df[(df.clo < 0) | (df.clo > 4)].index)
-df = df.drop(df[(df.vel < 0) | (df.vel > 4)].index)
-df = df.drop(df[(df.tr < 0) | (df.tr > 50)].index)
-
-# drop PMV, PPD, and SET values previously calculated
-df = df.drop(columns=["pmv", "ppd", "set"])
-
-# estimate mean radiant temperature from operative temperature
-df.loc[df.tr.isna(), "tr"] = 2 * df[df.tr.isna()].top - df[df.tr.isna()].ta
-
-# drop rows which do not have the necessary data to calculate the PMV
-df_pmv = df.copy().dropna(subset=["ta", "tr", "rh", "met", "vel", "clo"])
-
-# calculate relative air speed and dynamic clothing
-v_rel = v_relative(v=df_pmv["vel"], met=df_pmv["met"])
-clo_d = clo_dynamic(clo=df_pmv["clo"], met=df_pmv["met"])
-df_pmv["vel_r"] = v_rel
-df_pmv["clo_d"] = clo_d
-
-# calculate SET temperature
-df_pmv["set"] = set_tmp(
-    tdb=df_pmv.ta,
-    tr=df_pmv.tr,
-    v=df_pmv.vel,
-    rh=df_pmv.rh,
-    met=df_pmv.met,
-    clo=df_pmv.clo,
-)
-
-df = pd.merge(df, df_pmv[["set"]], left_index=True, right_index=True, how="left")
-
-# calculate different PMV indices
-results = pmv_ppd(
-    tdb=df_pmv["ta"],
-    tr=df_pmv["tr"],
-    vr=df_pmv["vel_r"],
-    rh=df_pmv["rh"],
-    met=df_pmv["met"],
-    clo=df_pmv["clo_d"],
-    wme=0,
-    standard="ashrae",
-)
-
-df_pmv["pmv_ce"] = results["pmv"]
-df_pmv["ppd_ce"] = results["ppd"]
-
-results = pmv_ppd(
-    tdb=df_pmv["ta"],
-    tr=df_pmv["tr"],
-    vr=df_pmv["vel_r"],
-    rh=df_pmv["rh"],
-    met=df_pmv["met"],
-    clo=df_pmv["clo_d"],
-    wme=0,
-    standard="iso",
-)
-
-df_pmv["pmv"] = results["pmv"]
-df_pmv["ppd"] = results["ppd"]
-
-df = pd.merge(
-    df,
-    df_pmv[["pmv", "ppd", "pmv_ce", "ppd_ce"]],
-    left_index=True,
-    right_index=True,
-    how="left",
-)
-
-df.to_csv("./v2.1.0/db_measurements_v2.1.0.csv.gz", compression="gzip", index=False)
 
 
 def data_validation(data):
@@ -220,3 +116,160 @@ def data_validation(data):
         data=data.sort_values("thermal_preference"),
     )
     plt.tight_layout()
+
+
+def calculate_running_mean_outdoor_temperature():
+    """This function calculates the running mean outdoor temperature using
+    pythermalcomfort function running_mean_outdoor_temperature.
+
+    It uses the default values for alpha and it calculates the value
+    using 7-day of data.
+    """
+
+    df_weather = pd.read_csv(
+        "./v2.1.0/weather_data.gz",
+        compression="gzip",
+    )
+
+    df_weather.date = pd.to_datetime(df_weather.date).dt.date
+    df_weather["t_rmt"] = np.nan
+    for station in df_weather.code.unique():
+        df_station = df_weather.query("code == @station").sort_values("date")
+        for date in df_station.date.unique():
+            dates = pd.date_range(end=date, periods=8)
+            _ = df_station[
+                (df_station.date <= dates[-2].date())
+                & (df_station.date >= dates[0].date())
+            ]
+            _ = _[["date", "t_out_isd"]].sort_values("date", ascending=False)
+            if _.shape[0] == 7:
+                t_rmt = running_mean_outdoor_temperature(_.t_out_isd.values)
+                df_weather.loc[
+                    (df_weather.code == station) & (df_weather.date == date), "t_rmt"
+                ] = t_rmt
+
+    df_weather.to_csv("./v2.1.0/weather_data_t_rmt.gz", compression="gzip", index=False)
+
+
+if __name__ == "__main__":
+
+    # read old version of the DB
+    df = pd.read_csv(
+        "./v2.1.0/db_measurements_v2.0.1.csv.gz",
+        low_memory=False,
+        compression="gzip",
+    )
+
+    # dropping entries without ta and keeping only those with 10 < ta < 40
+    df = df[df["ta"] < 40]
+    df = df[df["ta"] > 10]
+
+    # filtering other variables too
+    df = df.drop(df[(df.met < 0) | (df.met > 4)].index)
+    df = df.drop(df[(df.clo < 0) | (df.clo > 4)].index)
+    df = df.drop(df[(df.vel < 0) | (df.vel > 4)].index)
+    df = df.drop(df[(df.tr < 0) | (df.tr > 50)].index)
+
+    # drop PMV, PPD, and SET values previously calculated
+    df = df.drop(columns=["pmv", "ppd", "set"])
+
+    # estimate mean radiant temperature from operative temperature
+    df.loc[df.tr.isna(), "tr"] = 2 * df[df.tr.isna()].top - df[df.tr.isna()].ta
+
+    # drop rows which do not have the necessary data to calculate the PMV
+    df_pmv = df.copy().dropna(subset=["ta", "tr", "rh", "met", "vel", "clo"])
+
+    # calculate relative air speed and dynamic clothing
+    v_rel = v_relative(v=df_pmv["vel"], met=df_pmv["met"])
+    clo_d = clo_dynamic(clo=df_pmv["clo"], met=df_pmv["met"])
+    df_pmv["vel_r"] = v_rel
+    df_pmv["clo_d"] = clo_d
+
+    # calculate SET temperature
+    df_pmv["set"] = set_tmp(
+        tdb=df_pmv.ta,
+        tr=df_pmv.tr,
+        v=df_pmv.vel,
+        rh=df_pmv.rh,
+        met=df_pmv.met,
+        clo=df_pmv.clo,
+    )
+
+    df = pd.merge(df, df_pmv[["set"]], left_index=True, right_index=True, how="left")
+
+    # calculate different PMV indices
+    results = pmv_ppd(
+        tdb=df_pmv["ta"],
+        tr=df_pmv["tr"],
+        vr=df_pmv["vel_r"],
+        rh=df_pmv["rh"],
+        met=df_pmv["met"],
+        clo=df_pmv["clo_d"],
+        wme=0,
+        standard="ashrae",
+    )
+
+    df_pmv["pmv_ce"] = results["pmv"]
+    df_pmv["ppd_ce"] = results["ppd"]
+
+    results = pmv_ppd(
+        tdb=df_pmv["ta"],
+        tr=df_pmv["tr"],
+        vr=df_pmv["vel_r"],
+        rh=df_pmv["rh"],
+        met=df_pmv["met"],
+        clo=df_pmv["clo_d"],
+        wme=0,
+        standard="iso",
+    )
+
+    df_pmv["pmv"] = results["pmv"]
+    df_pmv["ppd"] = results["ppd"]
+
+    df = pd.merge(
+        df,
+        df_pmv[["pmv", "ppd", "pmv_ce", "ppd_ce"]],
+        left_index=True,
+        right_index=True,
+        how="left",
+    )
+
+    # calculate weather data
+    df_meta = pd.read_csv(
+        "./v2.1.0/db_metadata.csv",
+    )
+
+    data = pd.merge(df, df_meta, on="building_id", how='left')
+    data.timestamp = pd.to_datetime(data.timestamp).dt.date
+
+    df_rmt = pd.read_csv("./v2.1.0/weather_data_t_rmt.gz", compression="gzip")
+    df_rmt.date = pd.to_datetime(df_rmt.date).dt.date
+
+    test = pd.merge(data[["isd_station", "timestamp", "t_mot_isd", "rh_out_isd", "t_out_isd", "contributor"]], df_rmt, left_on=["isd_station", "timestamp"], right_on=["code", "date"],  how='left')
+
+    plt.figure()
+    plt.scatter(df.t_out_isd, test.t_out_isd_y)
+    plt.plot([-30,40],[-30,40],c='k')
+    plt.show()
+    plt.figure()
+    plt.scatter(df.rh_out_isd, test.rh_out_isd_y)
+    plt.plot([10, 100],[10, 100],c='k')
+    plt.show()
+    plt.figure()
+    plt.scatter(test.t_mot_isd, test.t_rmt)
+    plt.plot([-30,40],[-30,40],c='k')
+    plt.show()
+
+    test['delta_t_out'] = df.t_out_isd - test.t_out_isd_y
+    print(test.loc[test['delta_t_out'].abs() > 1, ["t_out_isd_x", "t_out_isd_y"]])
+    test[test['delta_t_out'].abs() > 1].contributor.unique()
+
+    test['delta_rh_out'] = df.rh_out_isd - test.rh_out_isd_y
+    print(test.loc[test['delta_rh_out'].abs() > 1, ["rh_out_isd_x", "rh_out_isd_y"]])
+    test[test['delta_rh_out'].abs() > 1].contributor.unique()
+
+    # replace old weather data with new one
+    df[["t_mot_isd", "rh_out_isd", "t_out_isd"]] = test[["t_rmt", "rh_out_isd_y", "t_out_isd_y"]]
+
+    # save a new and updated version of the DB II
+    df.to_csv("./v2.1.0/db_measurements_v2.1.0.csv.gz", compression="gzip", index=False)
