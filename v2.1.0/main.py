@@ -268,65 +268,6 @@ if __name__ == "__main__":
     df.reset_index(inplace=True)
     test.reset_index(inplace=True)
 
-    # plt.figure()
-    # plt.scatter(df.t_out_isd, test.t_out_isd_y)
-    # plt.plot([-30, 40], [-30, 40], c="k")
-    # plt.show()
-    # plt.figure()
-    # plt.scatter(df.rh_out_isd, test.rh_out_isd_y)
-    # plt.plot([10, 100], [10, 100], c="k")
-    # plt.show()
-    # plt.figure()
-    # plt.scatter(test.t_mot_isd, test.t_rmt)
-    # plt.plot([-30, 40], [-30, 40], c="k")
-    # plt.show()
-    #
-    # test["delta_t_out"] = df.t_out_isd - test.t_out_isd_y
-    # print(
-    #     test.loc[
-    #         test["delta_t_out"].abs() > 1,
-    #         ["isd_station", "date", "delta_t_out", "t_out_isd_x", "t_out_isd_y"],
-    #     ].to_markdown()
-    # )
-    # print(
-    #     test.loc[test["delta_t_out"].abs() > 1]
-    #     .groupby(["isd_station", "date"])[["delta_t_out", "t_out_isd_x", "t_out_isd_y"]]
-    #     .mean()
-    #     .to_markdown()
-    # )
-    # df_rmt.query(
-    #     "code == '967470-99999' & date > datetime.datetime(1993,5,3).date() & date < datetime.datetime(1993,5,5).date()"
-    # )
-    # df_rmt = pd.read_csv("./v2.1.0/weather_data.gz", compression="gzip")
-    # print(
-    #     df_rmt.query(
-    #         "code == '967470-99999' & date == '1993-05-05T00:00:00Z'"
-    #     ).to_markdown()
-    # )
-    #
-    # df_201 = pd.read_csv(
-    #     "./v2.1.0/db_measurements_v2.0.1.csv.gz",
-    #     low_memory=False,
-    #     compression="gzip",
-    # )
-    # data_201 = pd.merge(df_201, df_meta, on="building_id", how="left")
-    # print(
-    #     data_201.query(
-    #         "isd_station == '967470-99999' & timestamp == '1993-05-05T00:00:00Z'"
-    #     )[["isd_station", "timestamp", "t_out_isd"]]
-    #     .head()
-    #     .to_markdown()
-    # )
-    #
-    # print(df_rmt.query("code == '967470-99999'").to_markdown())
-    #
-    # test[test["delta_t_out"].abs() > 1].contributor.unique()
-    # test[test["delta_t_out"].abs() > 1].date.unique()
-    #
-    # test["delta_rh_out"] = df.rh_out_isd - test.rh_out_isd_y
-    # print(test.loc[test["delta_rh_out"].abs() > 1, ["rh_out_isd_x", "rh_out_isd_y"]])
-    # test[test["delta_rh_out"].abs() > 1].contributor.unique()
-
     # replace old weather data with new one
     df[["t_mot_isd", "rh_out_isd", "t_out_isd"]] = test[
         ["t_rmt", "rh_out_isd_y", "t_out_isd_y"]
