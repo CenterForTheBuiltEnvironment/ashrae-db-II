@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from pythermalcomfort.models import pmv_ppd, set_tmp
@@ -9,7 +8,7 @@ from pythermalcomfort.utilities import (
 )
 
 
-def data_validation(data):
+def data_validation(_data):
     import matplotlib as mpl
 
     mpl.use("Qt5Agg")  # or can use 'TkAgg', whatever you have/prefer
@@ -17,7 +16,17 @@ def data_validation(data):
     import seaborn as sns
 
     # check weather data
-    db_210 = pd.read_csv("./v2.1.0/db_measurements_v2.1.0.csv.gz", compression="gzip")
+    db_210 = pd.read_csv(
+        "./v2.1.0/db_measurements_v2.1.0.csv.gz",
+        compression="gzip",
+        dtype={"air_movement_preference": str, "air_movement_acceptability": str},
+    )
+
+    # check data types
+    for col in db_210.columns:
+        print(col, set(type(x) for x in db_210[col].unique()))
+        print(col, db_210[col].unique())
+
     db_201 = pd.read_csv(
         "./v2.1.0/db_measurements_v2.0.1.csv.gz", compression="gzip", low_memory=False
     )
@@ -28,13 +37,13 @@ def data_validation(data):
     plt.scatter(x="t_out_isd_x", y="t_out_isd_y", data=df_combined)
     plt.show()
 
-    df_meta = pd.read_csv(
+    _df_meta = pd.read_csv(
         "./v2.1.0/db_metadata.csv",
     )
 
-    data = pd.merge(data, df_meta, on="building_id")
+    _data = pd.merge(_data, _df_meta, on="building_id")
 
-    print(data[["ta", "tr", "rh", "met", "vel", "clo"]].describe().to_markdown())
+    print(_data[["ta", "tr", "rh", "met", "vel", "clo"]].describe().to_markdown())
 
     sns.set_style("whitegrid")
     plt.rc("axes.spines", top=False, right=False, left=False)
@@ -42,9 +51,8 @@ def data_validation(data):
     plt.rcParams["figure.figsize"] = (7, 3)
 
     # check for anomalies in the thermal_sensation data
-    for id in data.contributor.unique():
-        df_building = data.query("contributor == @id")
-        # sns.regplot(x="ta", y="thermal_sensation", data=df_building)
+    for _id in _data.contributor.unique():
+        df_building = _data.query("contributor == @id")
         if df_building.dropna(subset="thermal_preference").shape[0] == 0:
             continue
         plt.figure()
@@ -53,71 +61,55 @@ def data_validation(data):
             y="thermal_sensation",
             data=df_building.sort_values("thermal_preference"),
         )
-        plt.title(id)
+        plt.title(_id)
         plt.tight_layout()
 
-    # check data types
-    for col in data.columns[[3, 36, 37]]:
-        print(col, set(type(x) for x in data[col].unique()))
-
     f, axs = plt.subplots(1, 2, sharey=True, sharex=True, constrained_layout=True)
-    sc = axs[0].scatter(x="pmv_ashrae", y="pmv", data=data, s=1, alpha=0.3)
-    axs[1].scatter(x="pmv_iso", y="pmv", data=data, s=1, alpha=0.3)
+    axs[0].scatter(x="pmv_ashrae", y="pmv", data=_data, s=1, alpha=0.3)
+    axs[1].scatter(x="pmv_iso", y="pmv", data=_data, s=1, alpha=0.3)
     axs[0].plot([-4, 4], [-4, 4])
     axs[1].plot([-4, 4], [-4, 4])
     axs[0].set(ylabel="PMV DB II", xlabel="PMV ASHRAE")
     axs[1].set(xlabel="PMV ISO")
-    # f.subplots_adjust(bottom=0.1, top=1, left=0.1, right=0.8, wspace=0.02, hspace=0.02)
-    # cax = f.add_axes([0.83, 0.1, 0.02, 0.8])
-    # plt.colorbar(sc, cax=cax)
     plt.show()
 
     f, axs = plt.subplots(1, 2, sharey=True, sharex=True, constrained_layout=True)
-    sc = axs[0].scatter(x="pmv_no_adj", y="pmv", data=data, s=1, alpha=0.3)
-    axs[1].scatter(x="pmv_iso", y="pmv", data=data, s=1, alpha=0.3)
+    axs[0].scatter(x="pmv_no_adj", y="pmv", data=_data, s=1, alpha=0.3)
+    axs[1].scatter(x="pmv_iso", y="pmv", data=_data, s=1, alpha=0.3)
     axs[0].plot([-4, 4], [-4, 4])
     axs[1].plot([-4, 4], [-4, 4])
     axs[0].set(ylabel="PMV DB II", xlabel="PMV NO CLO, VEL ADJUSTMENT")
     axs[1].set(xlabel="PMV ISO")
-    # f.subplots_adjust(bottom=0.1, top=1, left=0.1, right=0.8, wspace=0.02, hspace=0.02)
-    # cax = f.add_axes([0.83, 0.1, 0.02, 0.8])
-    # plt.colorbar(sc, cax=cax)
     plt.show()
 
     f, axs = plt.subplots(1, 1, sharey=True, sharex=True, constrained_layout=True)
-    sc = axs.scatter(x="set", y="asv", data=data, s=5, alpha=0.3)
+    axs.scatter(x="set", y="asv", data=_data, s=5, alpha=0.3)
     axs.set(ylabel="TSV", xlabel="set")
-    # f.subplots_adjust(bottom=0.1, top=1, left=0.1, right=0.8, wspace=0.02, hspace=0.02)
-    # cax = f.add_axes([0.83, 0.1, 0.02, 0.8])
-    # plt.colorbar(sc, cax=cax)
     plt.show()
 
     f, axs = plt.subplots(1, 1, sharey=True, sharex=True, constrained_layout=True)
-    sc = axs.scatter(x="set_py", y="set", data=data, s=5, alpha=0.3)
+    axs.scatter(x="set_py", y="set", data=_data, s=5, alpha=0.3)
     axs.set(ylabel="SET DB II", xlabel="SET pythermalcomfort")
     axs.plot([10, 40], [10, 40], c="k")
     inset_ax = f.add_axes([0.65, 0.25, 0.3, 0.2])
-    inset_ax.hist(data.set - data.set_py, 200)
+    inset_ax.hist(_data.set - _data.set_py, 200)
     inset_ax.set(title="Delta", xlim=(-1, 3), yticks=[])
-    # f.subplots_adjust(bottom=0.1, top=1, left=0.1, right=0.8, wspace=0.02, hspace=0.02)
-    # cax = f.add_axes([0.83, 0.1, 0.02, 0.8])
-    # plt.colorbar(sc, cax=cax)
 
     plt.figure()
     sns.boxenplot(
-        x="thermal_preference", y="ta", data=data.sort_values("thermal_preference")
+        x="thermal_preference", y="ta", data=_data.sort_values("thermal_preference")
     )
     plt.tight_layout()
 
     plt.figure()
     sns.boxenplot(
-        x="thermal_preference", y="set", data=data.sort_values("thermal_preference")
+        x="thermal_preference", y="set", data=_data.sort_values("thermal_preference")
     )
     plt.tight_layout()
 
     plt.figure()
     sns.boxenplot(
-        x="thermal_preference", y="asv", data=data.sort_values("thermal_preference")
+        x="thermal_preference", y="asv", data=_data.sort_values("thermal_preference")
     )
     plt.tight_layout()
 
@@ -125,7 +117,7 @@ def data_validation(data):
     sns.boxenplot(
         x="air_movement_preference",
         y="vel",
-        data=data.sort_values("thermal_preference"),
+        data=_data.sort_values("thermal_preference"),
     )
     plt.tight_layout()
 
@@ -134,7 +126,7 @@ def calculate_running_mean_outdoor_temperature():
     """This function calculates the running mean outdoor temperature using
     pythermalcomfort function running_mean_outdoor_temperature.
 
-    It uses the default values for alpha and it calculates the value
+    It uses the default values for alpha, and it calculates the value
     using 7-day of data.
     """
 
