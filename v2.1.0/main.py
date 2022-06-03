@@ -16,6 +16,18 @@ def data_validation(data):
     import matplotlib.pyplot as plt
     import seaborn as sns
 
+    # check weather data
+    db_210 = pd.read_csv("./v2.1.0/db_measurements_v2.1.0.csv.gz", compression="gzip")
+    db_201 = pd.read_csv(
+        "./v2.1.0/db_measurements_v2.0.1.csv.gz", compression="gzip", low_memory=False
+    )
+
+    plt.subplots(1, 1, constrained_layout=True)
+    df_combined = pd.merge(db_201, db_210, on="record_id", how="left")
+    plt.figure()
+    plt.scatter(x="t_out_isd_x", y="t_out_isd_y", data=df_combined)
+    plt.show()
+
     df_meta = pd.read_csv(
         "./v2.1.0/db_metadata.csv",
     )
