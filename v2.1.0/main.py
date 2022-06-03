@@ -239,37 +239,98 @@ if __name__ == "__main__":
         "./v2.1.0/db_metadata.csv",
     )
 
-    data = pd.merge(df, df_meta, on="building_id", how='left')
+    # merging database II data with metadata since I need to get station number
+    data = pd.merge(df, df_meta, on="building_id", how="left")
     data.timestamp = pd.to_datetime(data.timestamp).dt.date
 
+    # open the weather data file
     df_rmt = pd.read_csv("./v2.1.0/weather_data_t_rmt.gz", compression="gzip")
     df_rmt.date = pd.to_datetime(df_rmt.date).dt.date
 
-    test = pd.merge(data[["isd_station", "timestamp", "t_mot_isd", "rh_out_isd", "t_out_isd", "contributor"]], df_rmt, left_on=["isd_station", "timestamp"], right_on=["code", "date"],  how='left')
+    # merge database II data with weather data
+    test = pd.merge(
+        data[
+            [
+                "isd_station",
+                "timestamp",
+                "t_mot_isd",
+                "rh_out_isd",
+                "t_out_isd",
+                "contributor",
+            ]
+        ],
+        df_rmt,
+        left_on=["isd_station", "timestamp"],
+        right_on=["code", "date"],
+        how="left",
+    )
 
-    plt.figure()
-    plt.scatter(df.t_out_isd, test.t_out_isd_y)
-    plt.plot([-30,40],[-30,40],c='k')
-    plt.show()
-    plt.figure()
-    plt.scatter(df.rh_out_isd, test.rh_out_isd_y)
-    plt.plot([10, 100],[10, 100],c='k')
-    plt.show()
-    plt.figure()
-    plt.scatter(test.t_mot_isd, test.t_rmt)
-    plt.plot([-30,40],[-30,40],c='k')
-    plt.show()
+    df.reset_index(inplace=True)
+    test.reset_index(inplace=True)
 
-    test['delta_t_out'] = df.t_out_isd - test.t_out_isd_y
-    print(test.loc[test['delta_t_out'].abs() > 1, ["t_out_isd_x", "t_out_isd_y"]])
-    test[test['delta_t_out'].abs() > 1].contributor.unique()
-
-    test['delta_rh_out'] = df.rh_out_isd - test.rh_out_isd_y
-    print(test.loc[test['delta_rh_out'].abs() > 1, ["rh_out_isd_x", "rh_out_isd_y"]])
-    test[test['delta_rh_out'].abs() > 1].contributor.unique()
+    # plt.figure()
+    # plt.scatter(df.t_out_isd, test.t_out_isd_y)
+    # plt.plot([-30, 40], [-30, 40], c="k")
+    # plt.show()
+    # plt.figure()
+    # plt.scatter(df.rh_out_isd, test.rh_out_isd_y)
+    # plt.plot([10, 100], [10, 100], c="k")
+    # plt.show()
+    # plt.figure()
+    # plt.scatter(test.t_mot_isd, test.t_rmt)
+    # plt.plot([-30, 40], [-30, 40], c="k")
+    # plt.show()
+    #
+    # test["delta_t_out"] = df.t_out_isd - test.t_out_isd_y
+    # print(
+    #     test.loc[
+    #         test["delta_t_out"].abs() > 1,
+    #         ["isd_station", "date", "delta_t_out", "t_out_isd_x", "t_out_isd_y"],
+    #     ].to_markdown()
+    # )
+    # print(
+    #     test.loc[test["delta_t_out"].abs() > 1]
+    #     .groupby(["isd_station", "date"])[["delta_t_out", "t_out_isd_x", "t_out_isd_y"]]
+    #     .mean()
+    #     .to_markdown()
+    # )
+    # df_rmt.query(
+    #     "code == '967470-99999' & date > datetime.datetime(1993,5,3).date() & date < datetime.datetime(1993,5,5).date()"
+    # )
+    # df_rmt = pd.read_csv("./v2.1.0/weather_data.gz", compression="gzip")
+    # print(
+    #     df_rmt.query(
+    #         "code == '967470-99999' & date == '1993-05-05T00:00:00Z'"
+    #     ).to_markdown()
+    # )
+    #
+    # df_201 = pd.read_csv(
+    #     "./v2.1.0/db_measurements_v2.0.1.csv.gz",
+    #     low_memory=False,
+    #     compression="gzip",
+    # )
+    # data_201 = pd.merge(df_201, df_meta, on="building_id", how="left")
+    # print(
+    #     data_201.query(
+    #         "isd_station == '967470-99999' & timestamp == '1993-05-05T00:00:00Z'"
+    #     )[["isd_station", "timestamp", "t_out_isd"]]
+    #     .head()
+    #     .to_markdown()
+    # )
+    #
+    # print(df_rmt.query("code == '967470-99999'").to_markdown())
+    #
+    # test[test["delta_t_out"].abs() > 1].contributor.unique()
+    # test[test["delta_t_out"].abs() > 1].date.unique()
+    #
+    # test["delta_rh_out"] = df.rh_out_isd - test.rh_out_isd_y
+    # print(test.loc[test["delta_rh_out"].abs() > 1, ["rh_out_isd_x", "rh_out_isd_y"]])
+    # test[test["delta_rh_out"].abs() > 1].contributor.unique()
 
     # replace old weather data with new one
-    df[["t_mot_isd", "rh_out_isd", "t_out_isd"]] = test[["t_rmt", "rh_out_isd_y", "t_out_isd_y"]]
+    df[["t_mot_isd", "rh_out_isd", "t_out_isd"]] = test[
+        ["t_rmt", "rh_out_isd_y", "t_out_isd_y"]
+    ].values
 
     # save a new and updated version of the DB II
     df.to_csv("./v2.1.0/db_measurements_v2.1.0.csv.gz", compression="gzip", index=False)
