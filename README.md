@@ -25,6 +25,7 @@ There are many other changes included in this update. The full change log is bel
 - Added 6,566 measurements from new data contributions
 - Split database into metadata and measurement tables
 - Recalculated PMV/PPD using pythermalcomfort
+- Performed simple quality assurance on measurement database
 - Shared python code used to calculate PMV/PPD
 - Shared R code with an example analysis of adaptive thermal comfort
 - Dropped records with missing `ta`
@@ -47,6 +48,7 @@ There are many other changes included in this update. The full change log is bel
 - Added environmental control flag to metadata table
 - Added timestamp flag to metadata table
 - Added region to metadata table
+- Added quality assurance flag to metadata table
 - Replaced full reference in metadata table with DOI where known
 - Standardised country names in metadata table
 - Fixed season in Oseland dataset [Carlucci; Matteo Favero - NTNU]
@@ -84,6 +86,7 @@ There are many other changes included in this update. The full change log is bel
 | `isd_station`      | ISD station code for `t_out_isd`, `rh_out_isd` and `t_mot_isd`                                                                                                                                  |
 | `isd_distance`     | Estimated distance of ISD station to city of field study [km]                                                                                                                                    |
 | `database`         | Version of database when data source was added [1, 2, 2.1]                                                                                                                                      |
+| `quality_assurance`| Flag indicating if dataset from contributor passed automated quality assurance check [pass, fail]                                                                                                                                      |
 
 **Key for measurements table**
 
