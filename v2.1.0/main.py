@@ -238,7 +238,7 @@ if __name__ == "__main__":
         how="left",
     )
 
-    # calculate weather data
+    # merge weather data
     df_meta = pd.read_csv(
         "./v2.1.0/db_metadata.csv",
     )
@@ -257,9 +257,6 @@ if __name__ == "__main__":
             [
                 "isd_station",
                 "timestamp",
-                "t_mot_isd",
-                "rh_out_isd",
-                "t_out_isd",
                 "contributor",
             ]
         ],
@@ -273,9 +270,9 @@ if __name__ == "__main__":
     test.reset_index(inplace=True)
 
     # replace old weather data with new one
-    df[["t_mot_isd", "rh_out_isd", "t_out_isd"]] = test[
-        ["t_rmt", "rh_out_isd_y", "t_out_isd_y"]
-    ].values
+    df[["rh_out_isd", "t_out_isd"]] = test[["rh_out_isd", "t_out_isd"]].values
+
+    df["t_mot_isd"] = test[["t_rmt"]].values
 
     # save a new and updated version of the DB II
     df.to_csv("./v2.1.0/db_measurements_v2.1.0.csv.gz", compression="gzip", index=False)
