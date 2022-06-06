@@ -1,13 +1,13 @@
 #### ADAPTIVE COMFORT MODEL 2 ###
-# example analysis of adaptive comfort from 10.1016/j.enbuild.2019.109559
+# example analysis of adaptive comfort modified after 10.1016/j.enbuild.2019.109559
 # written by Thomas Parkinson, May 2022
+# NOTE: please consider citing 10.1016/j.enbuild.2019.109559 if you found this script useful in your own work
 
 
 #### SETUP ####
 
 # load packages
 library(tidyverse)
-library(here)
 library(broom)
 library(ggpmisc)
 library(scales)
@@ -17,13 +17,16 @@ library(scales)
 #### DATA PREPARATION ####
 
 # download metadata from DASH repository and read in as data table
-df_meta <- read_csv(here("v2.1.0", "db_metadata.csv"))
+df_meta <- read_csv("db_metadata.csv")
 
 # plot map of data records
 df_meta %>%
   group_by(country) %>%
   summarise(records = sum(records, na.rm = TRUE)) %>%
   ungroup() %>%
+  mutate(country = str_to_title(country),
+         country = str_replace(country, "Usa", "USA"),
+         country = str_replace(country, "Uk", "UK")) %>%
   left_join(map_data("world"), ., by = c("region" = "country")) %>%
   ggplot(., aes(x = long, y = lat)) +
   geom_polygon(aes(fill = records, group = group), colour = "grey95", size = 0.3) +
@@ -46,7 +49,7 @@ df_meta %>%
 
 
 # download database from DASH repository and read in as data table
-df_measurements <- read_csv(here("v2.1.0", "db_measurements_v2.1.0.csv.gz"))
+df_measurements <- read_csv("db_measurements_v2.1.0.csv.gz")
 
 # subset records with indoor air temperature, thermal sensation, relative humidity, and meteorological data
 df_acm2 <- df_measurements %>%
@@ -66,6 +69,11 @@ df_acm2 <- df_acm2 %>%
 df_acm2 <- df_meta %>%
   select(building_id, region, building_type, cooling_type, records) %>%
   left_join(df_acm2, ., by = "building_id")
+
+df_meta %>%
+  select(building_id, database) %>%
+  left_join(df_measurements, ., by = "building_id") %>%
+  count()
 
 # subset records from office buildings only
 df_acm2 <- df_acm2 %>%
@@ -123,8 +131,8 @@ df_models %>%
           color = "grey30", size = 0.3) +
   geom_point(aes(size = records), shape = 16, alpha = 0.25) +
   geom_smooth(aes(fill = cooling_type, weight = records), method = lm, se = TRUE, alpha = 0.1) + 
-  stat_poly_eq(formula = y ~ x, aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), eq.x.rhs = "t_out",
-               label.x = 0.09, parse = TRUE, size = 2.5, vstep = 0.035) +
+  #stat_poly_eq(formula = y ~ x, aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), eq.x.rhs = "t_out",
+  #             label.x = 0.09, parse = TRUE, size = 2.5, vstep = 0.035) +
   scale_x_continuous(expand = c(0, 0), breaks = seq(10, 30, by = 5), 
                      labels = number_format(accuracy = 1L, suffix = "°C")) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(20, 30, by = 5),
@@ -154,7 +162,7 @@ df_models %>%
         plot.margin = margin(2, 30, 2, 2, unit = "mm"))
 
 # save plot
-ggsave(file = here("acm_2_plot.png"), width = 9, height = 6, dpi = 300)
+ggsave(file = "acm_2_plot.png", width = 9, height = 6, dpi = 300)
 
 
 #### END ####
