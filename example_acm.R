@@ -16,8 +16,8 @@ library(scales)
 
 #### DATA PREPARATION ####
 
-# download metadata from DASH repository and read in as data table
-df_meta <- read_csv("db_metadata.csv")
+# read in metadata from Dryad as data table
+df_meta <- read_csv("https://datadryad.org/stash/downloads/file_stream/1546750")
 
 # plot map of data records
 df_meta %>%
@@ -48,8 +48,8 @@ df_meta %>%
         plot.margin = margin(0.1, 0.4, 0.1, 0.4, "cm"))
 
 
-# download database from DASH repository and read in as data table
-df_measurements <- read_csv("db_measurements_v2.1.0.csv.gz")
+# read in database from Dryad as data table
+df_measurements <- read_csv("https://datadryad.org/stash/downloads/file_stream/1546749")
 
 # subset records with indoor air temperature, thermal sensation, relative humidity, and meteorological data
 df_acm2 <- df_measurements %>%
@@ -69,11 +69,6 @@ df_acm2 <- df_acm2 %>%
 df_acm2 <- df_meta %>%
   select(building_id, region, building_type, cooling_type, records) %>%
   left_join(df_acm2, ., by = "building_id")
-
-df_meta %>%
-  select(building_id, database) %>%
-  left_join(df_measurements, ., by = "building_id") %>%
-  count()
 
 # subset records from office buildings only
 df_acm2 <- df_acm2 %>%
