@@ -30,9 +30,11 @@ df_meta %>%
   left_join(map_data("world"), ., by = c("region" = "country")) %>%
   ggplot(., aes(x = long, y = lat)) +
   geom_polygon(aes(fill = records, group = group), colour = "grey95", size = 0.3) +
+  geom_point(data = distinct(df_meta, lon, lat), aes(x = lon, y = lat), 
+             size = 1.5, shape = 16, colour = "#52489C", alpha = 0.6) +
   scale_fill_gradient(low = '#D1D6F0', high = "#465BC3", na.value = "grey90") +
   labs(title = "ASHRAE Global Thermal Comfort Database II",
-       subtitle = "Number of records by country in the database",
+       subtitle = "Records by country in version 2.1 of the database",
        x = NULL, y = NULL) +
   guides(fill = "none") +
   coord_fixed(ratio = 1, xlim = NULL, ylim = c(-50, 90), expand = TRUE, clip = "on") +
