@@ -4,63 +4,9 @@ The ASHRAE Global Thermal Comfort Database II combines sets of objective indoor 
 
 This repository contains the source code we used to generate each new version of the dataset. This allows you to track the changes we have implemented. We encourage you to submit an issue if you spot any errors or you would like us to implement some changes. The repository comprises different folders, each containing the source code and data we used to generate a new version of the database.
 
-## Changelog
+## Columns names and description
 
-### Version 2.1
-
-This is the first major update to the ASHRAE Global Thermal Comfort Database II since it was published in 2018. In the time since release, it has been used by hundreds of researchers who have found errors and requested new features. This update aims to address some of those while improving operability with other resources. As a result, there are breaking changes.
-
-The major updates to the database are:
-
-1. 6,566 new records from field studies in India, Malaysia, Italy, Japan, Indonesia, Singapore, and Cyprus. Thanks to Hasim Altan (Arkin University of Creative Arts and Design), Siti Aisyah Damiati (University of Adelaide), Harimi Djamila (Universiti Malaysia Sabah), Jeetika Malik (Lawrence Berkeley National Laboratory), Bertug Ozarisoy (University of East London), Elisabetta Maria Patane (University of Bath), and Rajan Rawal (CEPT University) for kindly sharing their data with the community.
-2. Improvements to the meteorological data. In the earlier version of the database, the source and quality of the meteorological data was unclear in some cases. We now use the NOAA Integrated Surface Database (ISD) for meteorological data where possible. Thanks to Peixian Li (Tongji University) for adding the timestamps from the original datasets (where available). Meteorological data from either the original dataset or the ISD are now included along with the relevant metadata.
-3. The database is now split into a metadata table and a measurements table. This should make working with the full dataset quicker and easier due to smaller file sizes and new fields in the metadata table.
-
-There are many other changes included in this update. The full change log is below:
-
-- Added building ID from RP-884 dataset
-- Added timestamp from RP-884 dataset
-- Added meteorological data from RP-884 dataset
-- Added timestamp to datasets where known [Ariel Li - Tongji University]
-- Added 6,566 measurements from new data contributions
-- Split database into metadata and measurement tables
-- Recalculated PMV/PPD using pythermalcomfort
-- Performed simple quality assurance on measurement database
-- Shared python code used to calculate PMV/PPD
-- Shared R code with an example analysis of adaptive thermal comfort
-- Dropped records with missing `ta`
-- Recoded many categorical scale variables to standardised English label text
-- Dropped all imperial units
-- Renamed headers to remove spaces and special characters
-- Renamed headers for PMV inputs to align with software packages [Federico Tartarini - BEARS; Marcel Schweiker - RWTH Aachen University]
-- Recoded cooling types `Mechanically ventilated`; and `Mixed (hybrid)` into `mixed mode`
-- Recoded season when timestamp and location is known
-- Added average daily temperature calculated from ISD data
-- Added running mean outdoor temperature from ISD data
-- Added inferred building id based on unique groupings of publication, country, city, season, building type, and cooling type
-- Added inferred building ID flag to metadata table
-- Added sample size for each building ID to metadata table
-- Added approximate coordinates to metadata table
-- Added time zone to metadata table
-- Added source of meteorological data to metadata table
-- Added ISD station number and distance to metadata table
-- Added categorical age field flag to metadata table [Jing Xiong - The University of Sydney]
-- Added environmental control flag to metadata table
-- Added timestamp flag to metadata table
-- Added region to metadata table
-- Added quality assurance flag to metadata table
-- Replaced full reference in metadata table with DOI where known
-- Standardised country names in metadata table
-- Fixed season in Oseland dataset [Carlucci; Matteo Favero - NTNU]
-- Added building ID in Oseland dataset
-- Fixed asv and building type in Zhangeri dataset [Salvatore Carlucci - The Cyprus Institute; Matteo Favero - Norwegian University of Science and Technology]
-- Added building ID in Zhangeri dataset
-- Removed thermal comfort vote for Zhangeri dataset [Salvatore Carlucci - The Cyprus Institute; Matteo Favero - Norwegian University of Science and Technology]
-- Added unique identifier for records (`record_id`) to help error reporting
-- Added new column (`subject_id`) for future submissions with repeated measures
-
-
-**Key for metadata table**
+### Metadata table
 
 | _parameter_        | _description_                                                                                                                                                                                   |
 |--------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -88,7 +34,7 @@ There are many other changes included in this update. The full change log is bel
 | `database`         | Version of database when data source was added [1, 2, 2.1]                                                                                                                                      |
 | `quality_assurance`| Flag indicating if dataset from contributor passed automated quality assurance check [pass, fail]                                                                                                                                      |
 
-**Key for measurements table**
+### Measurements table
 
 | _parameter_                  | _description_                                                                                                                                                                                                                                                                                                                                                    |
 |------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -150,3 +96,58 @@ You can contribute to the project by sending us your dataset. Please clean and c
 ### Reporting issues
 
 You can report issues with the database by using [this link](https://github.com/FedericoTartarini/ashrae-db-II/issues)
+
+## Changelog
+
+### Version 2.1
+
+This is the first major update to the ASHRAE Global Thermal Comfort Database II since it was published in 2018. In the time since release, it has been used by hundreds of researchers who have found errors and requested new features. This update aims to address some of those while improving operability with other resources. As a result, there are breaking changes.
+
+The major updates to the database are:
+
+1. 6,566 new records from field studies in India, Malaysia, Italy, Japan, Indonesia, Singapore, and Cyprus. Thanks to Hasim Altan (Arkin University of Creative Arts and Design), Siti Aisyah Damiati (University of Adelaide), Harimi Djamila (Universiti Malaysia Sabah), Jeetika Malik (Lawrence Berkeley National Laboratory), Bertug Ozarisoy (University of East London), Elisabetta Maria Patane (University of Bath), and Rajan Rawal (CEPT University) for kindly sharing their data with the community.
+2. Improvements to the meteorological data. In the earlier version of the database, the source and quality of the meteorological data was unclear in some cases. We now use the NOAA Integrated Surface Database (ISD) for meteorological data where possible. Thanks to Peixian Li (Tongji University) for adding the timestamps from the original datasets (where available). Meteorological data from either the original dataset or the ISD are now included along with the relevant metadata.
+3. The database is now split into a metadata table and a measurements table. This should make working with the full dataset quicker and easier due to smaller file sizes and new fields in the metadata table.
+
+There are many other changes included in this update. The full change log is below:
+
+- Added building ID from RP-884 dataset
+- Added timestamp from RP-884 dataset
+- Added meteorological data from RP-884 dataset
+- Added timestamp to datasets where known [Ariel Li - Tongji University]
+- Added 6,566 measurements from new data contributions
+- Split database into metadata and measurement tables
+- Recalculated PMV/PPD using pythermalcomfort
+- Performed simple quality assurance on measurement database
+- Shared python code used to calculate PMV/PPD
+- Shared R code with an example analysis of adaptive thermal comfort
+- Dropped records with missing `ta`
+- Recoded many categorical scale variables to standardised English label text
+- Dropped all imperial units
+- Renamed headers to remove spaces and special characters
+- Renamed headers for PMV inputs to align with software packages [Federico Tartarini - BEARS; Marcel Schweiker - RWTH Aachen University]
+- Recoded cooling types `Mechanically ventilated`; and `Mixed (hybrid)` into `mixed mode`
+- Recoded season when timestamp and location is known
+- Added average daily temperature calculated from ISD data
+- Added running mean outdoor temperature from ISD data
+- Added inferred building id based on unique groupings of publication, country, city, season, building type, and cooling type
+- Added inferred building ID flag to metadata table
+- Added sample size for each building ID to metadata table
+- Added approximate coordinates to metadata table
+- Added time zone to metadata table
+- Added source of meteorological data to metadata table
+- Added ISD station number and distance to metadata table
+- Added categorical age field flag to metadata table [Jing Xiong - The University of Sydney]
+- Added environmental control flag to metadata table
+- Added timestamp flag to metadata table
+- Added region to metadata table
+- Added quality assurance flag to metadata table
+- Replaced full reference in metadata table with DOI where known
+- Standardised country names in metadata table
+- Fixed season in Oseland dataset [Carlucci; Matteo Favero - NTNU]
+- Added building ID in Oseland dataset
+- Fixed asv and building type in Zhangeri dataset [Salvatore Carlucci - The Cyprus Institute; Matteo Favero - Norwegian University of Science and Technology]
+- Added building ID in Zhangeri dataset
+- Removed thermal comfort vote for Zhangeri dataset [Salvatore Carlucci - The Cyprus Institute; Matteo Favero - Norwegian University of Science and Technology]
+- Added unique identifier for records (`record_id`) to help error reporting
+- Added new column (`subject_id`) for future submissions with repeated measures
