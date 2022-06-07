@@ -71,10 +71,10 @@ to generate a new version of the database.
 | `vel_h`                      | Air speed measured at 1.1 m above the floor [m/s]                                                                                                                                                                                                                                                                                                                |
 | `vel_m`                      | Air speed measured at 0.6 m above the floor [m/s]                                                                                                                                                                                                                                                                                                                |
 | `vel_l`                      | Air speed measured at 0.1 m above the floor [m/s]                                                                                                                                                                                                                                                                                                                |
-| `vel_r`                      | Relative air speed used to calculate the PMV [m/s]                                                                                                                                                                                                                                                                                                               |
+| `vel_r`                      | [Relative air speed](https://pythermalcomfort.readthedocs.io/en/latest/reference/pythermalcomfort.html#relative-air-speed) used to calculate the PMV [m/s]                                                                                                                                                                                                       |
 | `met`                        | Average metabolic rate of the subject [met]                                                                                                                                                                                                                                                                                                                      |
 | `clo`                        | Intrinsic clothing ensemble insulation of the subject [clo]                                                                                                                                                                                                                                                                                                      |
-| `clo_d`                      | Dynamic clothing, used to calculate the PMV [clo]                                                                                                                                                                                                                                                                                                                |
+| `clo_d`                      | [Dynamic clothing](https://pythermalcomfort.readthedocs.io/en/latest/reference/pythermalcomfort.html#dynamic-clothing), used to calculate the PMV [clo]                                                                                                                                                                                                          |
 | `activity_10`                | Average metabolic rate of the subject in the last 10 minutes [met]                                                                                                                                                                                                                                                                                               |
 | `activity_20`                | Average metabolic rate of the subject in the last 20 minutes [met]                                                                                                                                                                                                                                                                                               |
 | `activity_30`                | Average metabolic rate of the subject in the last 30 minutes [met]                                                                                                                                                                                                                                                                                               |
@@ -150,7 +150,7 @@ There are many other changes included in this update. The full change log is bel
 - Added timestamp to datasets where known [Ariel Li - Tongji University]
 - Added 6,566 measurements from new data contributions
 - Split database into metadata and measurement tables
-- Recalculated PMV/PPD using pythermalcomfort
+- Recalculated PMV/PPD using [pythermalcomfort](https://pythermalcomfort.readthedocs.io/en/latest/readme.html)
 - Performed simple quality assurance on measurement database
 - Shared python code used to calculate PMV/PPD
 - Shared R code with an example analysis of adaptive thermal comfort
@@ -159,7 +159,7 @@ There are many other changes included in this update. The full change log is bel
 - Dropped all imperial units
 - Renamed headers to remove spaces and special characters
 - Renamed headers for PMV inputs to align with software
-  packages [Federico Tartarini - BEARS; Marcel Schweiker - RWTH Aachen University]
+  packages [[Federico Tartarini](https://federicotartarini.github.io/) - BEARS; Marcel Schweiker - RWTH Aachen University]
 - Recoded cooling types `Mechanically ventilated`; and `Mixed (hybrid)` into `mixed mode`
 - Recoded season when timestamp and location is known
 - Added average daily temperature calculated from ISD data
