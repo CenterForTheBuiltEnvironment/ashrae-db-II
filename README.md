@@ -5,8 +5,7 @@ environmental measurements with accompanying "right-here-right-now" subjective e
 by occupants from buildings around the world. The database is intended to support diverse
 inquiries about thermal comfort in field settings. This is the official repository which
 contains the code used to maintain the Database II from version 2.1 onward. You can
-download the latest version of the database
-from [here](https://datadryad.org/stash/dataset/doi:10.6078/D1F671).
+download the latest version of the database from the [Github repository](https://github.com/CenterForTheBuiltEnvironment/ashrae-db-II) or [Dryad](https://datadryad.org/stash/dataset/doi:10.6078/D1F671).
 
 This repository contains the source code we used to generate each new version of the
 dataset. This allows you to track the changes we have implemented. We encourage you to
@@ -16,7 +15,7 @@ to generate a new version of the database.
 
 ## Columns names and description
 
-### Metadata table
+### Database Metadata
 
 | _parameter_         | _description_                                                                                                                                                                                   |
 |---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -44,7 +43,7 @@ to generate a new version of the database.
 | `database`          | Version of database when data source was added [1, 2, 2.1]                                                                                                                                      |
 | `quality_assurance` | Flag indicating if dataset from contributor passed automated quality assurance check [pass, fail]                                                                                               |
 
-### Measurements table
+### Database Measurements
 
 | _parameter_                  | _description_                                                                                                                                                                                                                                                                                                                                                    |
 |------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
