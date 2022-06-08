@@ -4,6 +4,7 @@
 # NOTE: please consider citing 10.1016/j.enbuild.2019.109559 if you found this script useful in your own work
 
 
+
 #### SETUP ####
 
 # load packages
@@ -16,8 +17,8 @@ library(scales)
 
 #### DATA PREPARATION ####
 
-# read in metadata from Dryad as data table
-df_meta <- read_csv("https://datadryad.org/stash/downloads/file_stream/1546750")
+# read in metadata from Github as data table
+df_meta <- read_csv("https://github.com/CenterForTheBuiltEnvironment/ashrae-db-II/raw/master/v2.1.0/db_metadata.csv")
 
 # plot map of data records
 df_meta %>%
@@ -49,9 +50,12 @@ df_meta %>%
         axis.text = element_blank(),
         plot.margin = margin(0.1, 0.4, 0.1, 0.4, "cm"))
 
+# save map
+ggsave(file = "database_map.png", width = 7, height = 2.8, dpi = 300)
 
-# read in database from Dryad as data table
-df_measurements <- read_csv("https://datadryad.org/stash/downloads/file_stream/1546749")
+
+# read in database from Github as data table
+df_measurements <- read_csv("https://github.com/CenterForTheBuiltEnvironment/ashrae-db-II/raw/master/v2.1.0/db_measurements_v2.1.0.csv.gz")
 
 # subset records with indoor air temperature, thermal sensation, relative humidity, and meteorological data
 df_acm2 <- df_measurements %>%
@@ -145,13 +149,15 @@ df_models %>%
           color = "grey30", fontface = "italic", hjust = 0, vjust = 0.5, size = 2.5) +
   labs(title = "Adaptive Comfort Model",
        subtitle = "Example analysis of adaptive thermal comfort using the ASHRAE Global Thermal Comfort Database II",
+       caption = "Adapted from https://doi.org/10.1016/j.enbuild.2019.109559",
        x = "\nOutdoor Temperature", y = "Neutral Temperature\n", color = NULL) +
   guides(color = guide_legend(override.aes = list(fill = NA, label.position = "bottom")), 
          size = "none", fill = "none", alpha = "none") +
   coord_cartesian(clip = "off", xlim = c(8, 32), ylim = c(17, 33)) +
   theme_minimal(base_size = 10) +
-  theme(plot.title = element_text(size = 14, colour = "grey20", face = "bold", hjust = 0),
-        plot.subtitle = element_text(size = 10, colour = "grey20", face = "italic", hjust = 0, margin = margin(b = 10)),
+  theme(plot.title = element_text(size = 14, colour = "grey20", face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(size = 10, colour = "grey20", face = "italic", hjust = 0.5, margin = margin(b = 10)),
+        plot.caption = element_text(size = 6, colour = "grey20", face = "italic", hjust = 0.5),
         panel.grid.minor = element_blank(),
         panel.grid.major = element_line(size = 0.25, colour = "grey90"),
         legend.position = "top",
@@ -159,7 +165,7 @@ df_models %>%
         plot.margin = margin(2, 30, 2, 2, unit = "mm"))
 
 # save plot
-ggsave(file = "acm_2_plot.png", width = 9, height = 6, dpi = 300)
+ggsave(file = "acm2_plot.png", width = 8, height = 5, dpi = 300)
 
 
-#### END ####
+#### END
