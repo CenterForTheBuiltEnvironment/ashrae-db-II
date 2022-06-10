@@ -24,6 +24,7 @@ def data_validation():
         "./v2.1.0/db_measurements_v2.1.0.csv.gz",
         compression="gzip",
         dtype={"air_movement_preference": str, "air_movement_acceptability": str},
+        low_memory=False,
     )
 
     # check data types
@@ -32,13 +33,14 @@ def data_validation():
         print(col, db_210[col].unique())
 
     db_201 = pd.read_csv(
-        "./v2.1.0/db_measurements_v2.0.1.csv.gz", compression="gzip", low_memory=False
+        "./v2.1.0/source_data/db_measurements_v2.0.1.csv.gz",
+        compression="gzip",
+        low_memory=False,
     )
 
     # check weather data
     plt.subplots(1, 1, constrained_layout=True)
     df_combined = pd.merge(db_201, db_210, on="record_id", how="left")
-    plt.figure()
     plt.scatter(x="t_out_isd_x", y="t_out_isd_y", data=df_combined)
     plt.show()
 
@@ -71,6 +73,7 @@ def data_validation():
     inset_ax = f.add_axes([0.65, 0.25, 0.3, 0.2])
     inset_ax.hist(df_combined.set_x - df_combined.set_y, 200)
     inset_ax.set(title="Delta", xlim=(-1, 3), yticks=[])
+    plt.show()
 
     _data = pd.merge(db_210, _df_meta, on="building_id")
 
@@ -79,7 +82,7 @@ def data_validation():
     # check for anomalies in the thermal_sensation data
     for _id in _data.contributor.unique():
         df_building = _data.query("contributor == @_id")
-        if df_building.dropna(subset="thermal_preference").shape[0] == 0:
+        if df_building.dropna(subset=["thermal_preference"]).shape[0] == 0:
             continue
         plt.figure()
         sns.boxplot(
@@ -89,18 +92,21 @@ def data_validation():
         )
         plt.title(_id)
         plt.tight_layout()
+        plt.show()
 
     plt.figure()
     sns.boxenplot(
         x="thermal_preference", y="ta", data=_data.sort_values("thermal_preference")
     )
     plt.tight_layout()
+    plt.show()
 
     plt.figure()
     sns.boxenplot(
         x="thermal_preference", y="set", data=_data.sort_values("thermal_preference")
     )
     plt.tight_layout()
+    plt.show()
 
     plt.figure()
     sns.boxenplot(
@@ -109,6 +115,7 @@ def data_validation():
         data=_data.sort_values("thermal_preference"),
     )
     plt.tight_layout()
+    plt.show()
 
     plt.figure()
     sns.boxenplot(
@@ -117,6 +124,7 @@ def data_validation():
         data=_data.sort_values("thermal_preference"),
     )
     plt.tight_layout()
+    plt.show()
 
 
 def calculate_running_mean_outdoor_temperature():
