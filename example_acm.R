@@ -1,13 +1,14 @@
 #### ADAPTIVE COMFORT MODEL 2 ###
-# example analysis of adaptive comfort from 10.1016/j.enbuild.2019.109559
+# example analysis of adaptive comfort modified after 10.1016/j.enbuild.2019.109559
 # written by Thomas Parkinson, May 2022
+# NOTE: please consider citing 10.1016/j.enbuild.2019.109559 if you found this script useful in your own work
+
 
 
 #### SETUP ####
 
 # load packages
 library(tidyverse)
-library(here)
 library(broom)
 library(ggpmisc)
 library(scales)
@@ -16,20 +17,25 @@ library(scales)
 
 #### DATA PREPARATION ####
 
-# download metadata from DASH repository and read in as data table
-df_meta <- read_csv(here("v2.1.0", "db_metadata.csv"))
+# read in metadata from Github as data table
+df_meta <- read_csv("https://github.com/CenterForTheBuiltEnvironment/ashrae-db-II/raw/master/v2.1.0/db_metadata.csv")
 
 # plot map of data records
 df_meta %>%
   group_by(country) %>%
   summarise(records = sum(records, na.rm = TRUE)) %>%
   ungroup() %>%
+  mutate(country = str_to_title(country),
+         country = str_replace(country, "Usa", "USA"),
+         country = str_replace(country, "Uk", "UK")) %>%
   left_join(map_data("world"), ., by = c("region" = "country")) %>%
   ggplot(., aes(x = long, y = lat)) +
   geom_polygon(aes(fill = records, group = group), colour = "grey95", size = 0.3) +
+  geom_point(data = distinct(df_meta, lon, lat), aes(x = lon, y = lat), 
+             size = 1.5, shape = 16, colour = "#52489C", alpha = 0.6) +
   scale_fill_gradient(low = '#D1D6F0', high = "#465BC3", na.value = "grey90") +
   labs(title = "ASHRAE Global Thermal Comfort Database II",
-       subtitle = "Number of records by country in the database",
+       subtitle = "Records by country in version 2.1 of the database",
        x = NULL, y = NULL) +
   guides(fill = "none") +
   coord_fixed(ratio = 1, xlim = NULL, ylim = c(-50, 90), expand = TRUE, clip = "on") +
@@ -44,9 +50,12 @@ df_meta %>%
         axis.text = element_blank(),
         plot.margin = margin(0.1, 0.4, 0.1, 0.4, "cm"))
 
+# save map
+ggsave(file = "database_map.png", width = 7, height = 2.8, dpi = 300)
 
-# download database from DASH repository and read in as data table
-df_measurements <- read_csv(here("v2.1.0", "db_measurements_v2.1.0.csv.gz"))
+
+# read in database from Github as data table
+df_measurements <- read_csv("https://github.com/CenterForTheBuiltEnvironment/ashrae-db-II/raw/master/v2.1.0/db_measurements_v2.1.0.csv.gz")
 
 # subset records with indoor air temperature, thermal sensation, relative humidity, and meteorological data
 df_acm2 <- df_measurements %>%
@@ -123,8 +132,8 @@ df_models %>%
           color = "grey30", size = 0.3) +
   geom_point(aes(size = records), shape = 16, alpha = 0.25) +
   geom_smooth(aes(fill = cooling_type, weight = records), method = lm, se = TRUE, alpha = 0.1) + 
-  stat_poly_eq(formula = y ~ x, aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), eq.x.rhs = "t_out",
-               label.x = 0.09, parse = TRUE, size = 2.5, vstep = 0.035) +
+  #stat_poly_eq(formula = y ~ x, aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), eq.x.rhs = "t_out",
+  #             label.x = 0.09, parse = TRUE, size = 2.5, vstep = 0.035) +
   scale_x_continuous(expand = c(0, 0), breaks = seq(10, 30, by = 5), 
                      labels = number_format(accuracy = 1L, suffix = "°C")) +
   scale_y_continuous(expand = c(0, 0), breaks = seq(20, 30, by = 5),
@@ -140,13 +149,15 @@ df_models %>%
           color = "grey30", fontface = "italic", hjust = 0, vjust = 0.5, size = 2.5) +
   labs(title = "Adaptive Comfort Model",
        subtitle = "Example analysis of adaptive thermal comfort using the ASHRAE Global Thermal Comfort Database II",
+       caption = "Adapted from https://doi.org/10.1016/j.enbuild.2019.109559",
        x = "\nOutdoor Temperature", y = "Neutral Temperature\n", color = NULL) +
   guides(color = guide_legend(override.aes = list(fill = NA, label.position = "bottom")), 
          size = "none", fill = "none", alpha = "none") +
   coord_cartesian(clip = "off", xlim = c(8, 32), ylim = c(17, 33)) +
   theme_minimal(base_size = 10) +
-  theme(plot.title = element_text(size = 14, colour = "grey20", face = "bold", hjust = 0),
-        plot.subtitle = element_text(size = 10, colour = "grey20", face = "italic", hjust = 0, margin = margin(b = 10)),
+  theme(plot.title = element_text(size = 14, colour = "grey20", face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(size = 10, colour = "grey20", face = "italic", hjust = 0.5, margin = margin(b = 10)),
+        plot.caption = element_text(size = 6, colour = "grey20", face = "italic", hjust = 0.5),
         panel.grid.minor = element_blank(),
         panel.grid.major = element_line(size = 0.25, colour = "grey90"),
         legend.position = "top",
@@ -154,7 +165,7 @@ df_models %>%
         plot.margin = margin(2, 30, 2, 2, unit = "mm"))
 
 # save plot
-ggsave(file = here("acm_2_plot.png"), width = 9, height = 6, dpi = 300)
+ggsave(file = "acm2_plot.png", width = 8, height = 5, dpi = 300)
 
 
-#### END ####
+#### END

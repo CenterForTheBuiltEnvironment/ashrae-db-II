@@ -8,14 +8,18 @@ from pythermalcomfort.utilities import (
 )
 
 
-def data_validation(_data):
+def data_validation():
     import matplotlib as mpl
 
     mpl.use("Qt5Agg")  # or can use 'TkAgg', whatever you have/prefer
     import matplotlib.pyplot as plt
     import seaborn as sns
 
-    # check weather data
+    sns.set_style("whitegrid")
+    plt.rc("axes.spines", top=False, right=False, left=False)
+    plt.rcParams["font.family"] = "sans-serif"
+    plt.rcParams["figure.figsize"] = (7, 3)
+
     db_210 = pd.read_csv(
         "./v2.1.0/db_measurements_v2.1.0.csv.gz",
         compression="gzip",
@@ -31,6 +35,7 @@ def data_validation(_data):
         "./v2.1.0/db_measurements_v2.0.1.csv.gz", compression="gzip", low_memory=False
     )
 
+    # check weather data
     plt.subplots(1, 1, constrained_layout=True)
     df_combined = pd.merge(db_201, db_210, on="record_id", how="left")
     plt.figure()
@@ -41,18 +46,39 @@ def data_validation(_data):
         "./v2.1.0/db_metadata.csv",
     )
 
-    _data = pd.merge(_data, _df_meta, on="building_id")
+    # check PMV
+    print(df_combined[["pmv_x", "pmv_y", "pmv_ce"]].describe().to_markdown())
+
+    f, axs = plt.subplots(1, 2, sharey=True, sharex=True, constrained_layout=True)
+    axs[0].scatter(y="pmv_x", x="pmv_y", data=df_combined, s=1, alpha=0.05)
+    axs[1].scatter(y="pmv_x", x="pmv_ce", data=df_combined, s=1, alpha=0.05)
+    axs[0].plot([-4, 4], [-4, 4])
+    axs[1].plot([-4, 4], [-4, 4])
+    axs[0].set(ylabel="PMV DB II", xlabel="PMV ISO")
+    axs[1].set(xlabel="PMV ASHRAE")
+    inset_ax = f.add_axes([0.35, 0.25, 0.15, 0.2])
+    inset_ax.hist(df_combined.pmv_x - df_combined.pmv_y, 100)
+    inset_ax.set(title="Delta", xlim=(-0.25, 1), yticks=[])
+    inset_ax = f.add_axes([0.80, 0.25, 0.15, 0.2])
+    inset_ax.hist(df_combined.pmv_x - df_combined.pmv_ce, 100)
+    inset_ax.set(title="Delta", xlim=(-0.25, 1), yticks=[])
+    plt.show()
+
+    f, axs = plt.subplots(1, 1, constrained_layout=True)
+    axs.scatter(x="set_y", y="set_x", data=df_combined, s=5, alpha=0.3)
+    axs.set(ylabel="SET DB II", xlabel="SET pythermalcomfort")
+    axs.plot([10, 40], [10, 40], c="k")
+    inset_ax = f.add_axes([0.65, 0.25, 0.3, 0.2])
+    inset_ax.hist(df_combined.set_x - df_combined.set_y, 200)
+    inset_ax.set(title="Delta", xlim=(-1, 3), yticks=[])
+
+    _data = pd.merge(db_210, _df_meta, on="building_id")
 
     print(_data[["ta", "tr", "rh", "met", "vel", "clo"]].describe().to_markdown())
 
-    sns.set_style("whitegrid")
-    plt.rc("axes.spines", top=False, right=False, left=False)
-    plt.rcParams["font.family"] = "sans-serif"
-    plt.rcParams["figure.figsize"] = (7, 3)
-
     # check for anomalies in the thermal_sensation data
     for _id in _data.contributor.unique():
-        df_building = _data.query("contributor == @id")
+        df_building = _data.query("contributor == @_id")
         if df_building.dropna(subset="thermal_preference").shape[0] == 0:
             continue
         plt.figure()
@@ -63,37 +89,6 @@ def data_validation(_data):
         )
         plt.title(_id)
         plt.tight_layout()
-
-    f, axs = plt.subplots(1, 2, sharey=True, sharex=True, constrained_layout=True)
-    axs[0].scatter(x="pmv_ashrae", y="pmv", data=_data, s=1, alpha=0.3)
-    axs[1].scatter(x="pmv_iso", y="pmv", data=_data, s=1, alpha=0.3)
-    axs[0].plot([-4, 4], [-4, 4])
-    axs[1].plot([-4, 4], [-4, 4])
-    axs[0].set(ylabel="PMV DB II", xlabel="PMV ASHRAE")
-    axs[1].set(xlabel="PMV ISO")
-    plt.show()
-
-    f, axs = plt.subplots(1, 2, sharey=True, sharex=True, constrained_layout=True)
-    axs[0].scatter(x="pmv_no_adj", y="pmv", data=_data, s=1, alpha=0.3)
-    axs[1].scatter(x="pmv_iso", y="pmv", data=_data, s=1, alpha=0.3)
-    axs[0].plot([-4, 4], [-4, 4])
-    axs[1].plot([-4, 4], [-4, 4])
-    axs[0].set(ylabel="PMV DB II", xlabel="PMV NO CLO, VEL ADJUSTMENT")
-    axs[1].set(xlabel="PMV ISO")
-    plt.show()
-
-    f, axs = plt.subplots(1, 1, sharey=True, sharex=True, constrained_layout=True)
-    axs.scatter(x="set", y="asv", data=_data, s=5, alpha=0.3)
-    axs.set(ylabel="TSV", xlabel="set")
-    plt.show()
-
-    f, axs = plt.subplots(1, 1, sharey=True, sharex=True, constrained_layout=True)
-    axs.scatter(x="set_py", y="set", data=_data, s=5, alpha=0.3)
-    axs.set(ylabel="SET DB II", xlabel="SET pythermalcomfort")
-    axs.plot([10, 40], [10, 40], c="k")
-    inset_ax = f.add_axes([0.65, 0.25, 0.3, 0.2])
-    inset_ax.hist(_data.set - _data.set_py, 200)
-    inset_ax.set(title="Delta", xlim=(-1, 3), yticks=[])
 
     plt.figure()
     sns.boxenplot(
@@ -109,7 +104,9 @@ def data_validation(_data):
 
     plt.figure()
     sns.boxenplot(
-        x="thermal_preference", y="asv", data=_data.sort_values("thermal_preference")
+        x="thermal_preference",
+        y="thermal_sensation",
+        data=_data.sort_values("thermal_preference"),
     )
     plt.tight_layout()
 
