@@ -159,7 +159,7 @@ if __name__ == "__main__":
 
     # read old version of the DB
     df = pd.read_csv(
-        "./v2.1.0/db_measurements_v2.0.1.csv.gz",
+        "./v2.1.0/source_data/db_measurements_v2.0.1.csv.gz",
         low_memory=False,
         compression="gzip",
     )
@@ -248,7 +248,9 @@ if __name__ == "__main__":
     data.timestamp = pd.to_datetime(data.timestamp).dt.date
 
     # open the weather data file
-    df_rmt = pd.read_csv("./v2.1.0/weather_data_t_rmt.gz", compression="gzip")
+    df_rmt = pd.read_csv(
+        "./v2.1.0/source_data/weather_data_t_rmt.gz", compression="gzip"
+    )
     df_rmt.date = pd.to_datetime(df_rmt.date).dt.date
 
     # merge database II data with weather data
