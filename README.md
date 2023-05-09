@@ -1,3 +1,4 @@
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ruijis/ashrae-db-II/HEAD)
 # ASHRAE Global Thermal Comfort Database
 
 The ASHRAE Global Thermal Comfort Database II combines sets of objective indoor
