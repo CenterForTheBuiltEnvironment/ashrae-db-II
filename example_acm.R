@@ -88,7 +88,7 @@ df_acm2 <- df_acm2 %>%
 # do linear models for each building id
 df_models <- df_acm2 %>%
   nest(data = -c(building_id)) %>%
-  mutate(fit = map(data, ~ lm(ta ~ thermal_sensation, data = .x)),
+  mutate(fit = map(data, ~ lm(thermal_sensation ~ ta, data = .x)),
          tidy = map(fit, broom::tidy))
 
 # get model coefficients
@@ -99,7 +99,7 @@ df_models <- df_models %>%
 
 # drop insignificant models and keep neutral temperatures
 df_models <- df_models %>%
-  filter(tidy_term == "(Intercept)", 
+  filter(tidy_term == "(ta)", 
          tidy_p.value < 0.05) %>%
   select(building_id,
          "neutral_temp" = "tidy_estimate")
